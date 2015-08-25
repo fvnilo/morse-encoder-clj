@@ -4,7 +4,7 @@
    [dynne.sampled-sound :refer :all]))
 
 (def alphabet {\A ".-" \B "-..." \C "-.-." \D "-.." \E "." \F"..-."
-               \G "--." \H "..." \I ".." \J ".---" \K "-.-" \L ".-.."
+               \G "--." \H "...." \I ".." \J ".---" \K "-.-" \L ".-.."
                \M "--" \N "-." \O "---" \P ".--." \Q "--.-" \R ".-."
                \S "..." \T "-" \U "..-" \V "...-" \W ".--" \X "-..-"
                \Y "-.--" \Z "--.." \space "/" \0 "-----" \1 ".----"
@@ -18,12 +18,12 @@
 (def short-gap (silence 0.3 1))
 (def medium-gap (silence 0.6 1))
 
-(defn get-signal-symbol
+(defn get-signal-sound
   [symbol]
   (case symbol
     \. dit
     \- dah
-    \/ word-space))
+    \/ medium-gap))
 
 (defn break-to-chars
   [message]
@@ -38,15 +38,15 @@
 
 (defn build-letter-sound-signals
   [morse-letter]
-  (let [symbols (break-to-chars morse-letter)
-        sounds (map get-symbol-sound symbols)]
+  (let [signals (break-to-chars morse-letter)
+        sounds (map get-signal-sound signals)]
     (if (> (count sounds) 1)
       (reduce #(append (append %1 signal-gap) %2) sounds)
       (first sounds))))
 
 (defn build-words-sound-signals
   [morse-letters]
-  (map memoized morse-letters))
+  (map build-letter-sound-signals morse-letters))
 
 (defn append-sound-signals
   [sounds]
