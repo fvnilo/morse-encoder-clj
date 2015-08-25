@@ -11,7 +11,8 @@
 
 (def dit (sinusoid 0.2 440))
 (def dah (sinusoid 0.6 440))
-(def letter-space (silence 0.2 1))
+(def signal-space (silence 0.2 1))
+(def letter-space (silence 0.6 1))
 (def word-space (silence 0.8 1))
 
 (defn get-symbol-sound
@@ -37,8 +38,8 @@
   (let [symbols (break-to-chars morse-letter)
         sounds (map get-symbol-sound symbols)]
     (if (> (count sounds) 1)
-      (append (reduce #(append (append %1 letter-space) %2) sounds) letter-space)
-      (append (first sounds) letter-space))))
+      (reduce #(append (append %1 signal-space) %2) sounds)
+      (append (first sounds) signal-space))))
 
 (def build-letter-sound-memoized (memoize build-letter-sound))
 
@@ -46,13 +47,14 @@
   [morse-letters]
   (map build-letter-sound-memoized morse-letters))
 
-(defn build-entire-message-sound
+(defn append-sounds
   [sounds]
-  (reduce #(append %1 %2) sounds))
+  (reduce #(append %1 (append letter-space %2)) sounds))
 
 
 (defn encode-to-morse
   [message]
   (-> (morse message)
       (build-words-sounds)
-      (build-entire-message-sound)))
+      (append-sounds)
+      (#(save %1 "sample.wav" 44100))))
