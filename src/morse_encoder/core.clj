@@ -34,7 +34,7 @@
 (defn to-morse
   [message]
   (let [characters (break-to-chars message)]
-    (map #(alphabet %) characters)))
+    (pmap #(alphabet %) characters)))
 
 (defn build-letter-sound-signals
   [morse-letter]
@@ -46,16 +46,15 @@
 
 (defn build-words-sound-signals
   [morse-letters]
-  (map build-letter-sound-signals morse-letters))
+  (pmap build-letter-sound-signals morse-letters))
 
 (defn append-sound-signals
   [sounds]
   (reduce #(append %1 (append short-gap %2)) sounds))
 
 
-(defn to-morse-signals
-  [message]
-  (-> (to-morse message)
-      (build-words-sound-signals)
+(defn to-sound-file
+  [morse-letters filename]
+  (-> (build-words-sound-signals morse-letters)
       (append-sound-signals)
-      (#(save %1 "sample.wav" 44100))))
+      (#(save %1 filename 3200))))
