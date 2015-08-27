@@ -44,9 +44,11 @@
       (reduce #(append (append %1 signal-gap) %2) sounds)
       (first sounds))))
 
+(def memoized-sounds (memoize build-letter-sound-signals))
+
 (defn build-words-sound-signals
   [morse-letters]
-  (pmap build-letter-sound-signals morse-letters))
+  (map memoized-sounds morse-letters))
 
 (defn append-sound-signals
   [sounds]
@@ -57,4 +59,4 @@
   [morse-letters filename]
   (-> (build-words-sound-signals morse-letters)
       (append-sound-signals)
-      (#(save %1 filename 3200))))
+      (#(save %1 filename 2200))))
